@@ -4,6 +4,7 @@ import dev.pedrorodrigo.currencyexchange.client.ExchangeRateClient;
 import dev.pedrorodrigo.currencyexchange.dto.ConversionResponse;
 import dev.pedrorodrigo.currencyexchange.dto.ExchangeRateResponse;
 import dev.pedrorodrigo.currencyexchange.exception.CurrencyNotFoundException;
+import dev.pedrorodrigo.currencyexchange.exception.InvalidAmountException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -30,6 +31,12 @@ public class ExchangeService {
         }
 
         BigDecimal convertedAmount = amount.multiply(rate);
+
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidAmountException(
+                    "Amount must be greater than zero"
+            );
+        }
 
         return new ConversionResponse(
                 from,
