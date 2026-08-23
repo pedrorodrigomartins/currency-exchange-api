@@ -1,6 +1,7 @@
 package dev.pedrorodrigo.currencyexchange.client;
 
 import dev.pedrorodrigo.currencyexchange.dto.ExchangeRateResponse;
+import dev.pedrorodrigo.currencyexchange.exception.InvalidCurrencyException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -21,6 +22,14 @@ public class ExchangeRateClient {
         return restClient.get()
                 .uri("/{apiKey}/latest/{baseCurrency}", apiKey, baseCurrency)
                 .retrieve()
+                .onStatus(
+                        status -> status.value() == 404,
+                        (request, response) -> {
+                            throw new InvalidCurrencyException(
+                                    "Invalid currency: " + baseCurrency
+                            );
+                        }
+                )
                 .body(ExchangeRateResponse.class);
 
     }
