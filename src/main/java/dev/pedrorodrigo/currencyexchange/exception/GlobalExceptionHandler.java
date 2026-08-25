@@ -99,4 +99,21 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<ErrorResponse> handleExternalApi(
+            ExternalApiException ex,
+            HttpServletRequest request
+    ) {
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_GATEWAY.value(),
+                HttpStatus.BAD_GATEWAY.getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(error);
+    }
 }

@@ -1,6 +1,7 @@
 package dev.pedrorodrigo.currencyexchange.client;
 
 import dev.pedrorodrigo.currencyexchange.dto.ExchangeRateResponse;
+import dev.pedrorodrigo.currencyexchange.exception.ExternalApiException;
 import dev.pedrorodrigo.currencyexchange.exception.InvalidCurrencyException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,14 @@ public class ExchangeRateClient {
                         (request, response) -> {
                             throw new InvalidCurrencyException(
                                     "Invalid currency: " + baseCurrency
+                            );
+                        }
+                )
+                .onStatus(
+                        status -> status.is5xxServerError(),
+                        (request, response) -> {
+                            throw new ExternalApiException(
+                                    "External exchange rate service is unavailable"
                             );
                         }
                 )
