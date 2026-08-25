@@ -5,6 +5,7 @@ import dev.pedrorodrigo.currencyexchange.dto.ConversionResponse;
 import dev.pedrorodrigo.currencyexchange.dto.ExchangeRateResponse;
 import dev.pedrorodrigo.currencyexchange.exception.CurrencyNotFoundException;
 import dev.pedrorodrigo.currencyexchange.exception.InvalidAmountException;
+import dev.pedrorodrigo.currencyexchange.exception.InvalidCurrencyException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,6 +20,25 @@ public class ExchangeService {
     }
 
     public ConversionResponse convert(String from, String to, BigDecimal amount) {
+
+        if (from == null || from.isBlank()) {
+            throw new InvalidCurrencyException(
+                    "Source currency must not be blank"
+            );
+        }
+
+        if (to == null || to.isBlank()) {
+            throw new InvalidCurrencyException(
+                    "Target currency must not be blank"
+            );
+        }
+
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidAmountException(
+                    "Amount must be greater than zero"
+            );
+        }
+
         from = from.toUpperCase();
         to = to.toUpperCase();
 
@@ -31,12 +51,6 @@ public class ExchangeService {
         }
 
         BigDecimal convertedAmount = amount.multiply(rate);
-
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidAmountException(
-                    "Amount must be greater than zero"
-            );
-        }
 
         return new ConversionResponse(
                 from,
